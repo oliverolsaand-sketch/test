@@ -319,11 +319,11 @@
     <div class="canvas-area">
       <div class="canvas-wrap">
         <canvas id="canvas" width="1280" height="720"></canvas>
-        <div class="canvas-tag" id="canvasTag">Vytvor svoj thumbnail</div>
+        <div class="canvas-tag" id="canvasTag">Create your thumbnail</div>
         <button class="final-toggle" id="finalBtn">👑 Final</button>
         <div class="actions-bar">
-          <button class="mini-btn" id="downloadBtn">⬇ Stiahnuť</button>
-          <button class="mini-btn" id="shareBtn">⧉ Kopírovať</button>
+          <button class="mini-btn" id="downloadBtn">⬇ Download</button>
+          <button class="mini-btn" id="shareBtn">⧉ Copy</button>
         </div>
       </div>
     </div>
@@ -361,13 +361,13 @@
         <div class="layer-row on" data-layer="skinsFx">
           <div class="vis-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></div>
           <div class="layer-thumb"><img id="thumbSkinsFx" alt=""></div>
-          <div class="layer-name">Skiny s efektmi (glow)</div>
+          <div class="layer-name">Skins with effects (glow)</div>
         </div>
 
         <div class="layer-row locked">
           <div class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
           <div class="layer-thumb"><img id="thumbBasicSkins" alt=""></div>
-          <div class="layer-name">Basic skiny (flat)</div>
+          <div class="layer-name">Basic skins (flat)</div>
         </div>
 
         <div class="layer-row on" data-layer="text">
@@ -385,11 +385,11 @@
         <div class="layer-row on" data-layer="foto">
           <div class="vis-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></div>
           <div class="layer-thumb"><img id="thumbFoto" alt=""></div>
-          <div class="layer-name">Foto (základ)</div>
+          <div class="layer-name">Photo (base)</div>
         </div>
       </div>
 
-      <div class="footer-note">Klikni na vrstvu, aby si ju zapol/vypol (presne ako "eye" ikonka v Photoshope). Zámok = vrstva je vždy zapnutá.</div>
+      <div class="footer-note">Click a layer to toggle it on/off (just like the "eye" icon in Photoshop). Lock = layer is always on.</div>
     </div>
   </div>
 
@@ -424,12 +424,12 @@
       if (!img) return;
       ctx.clearRect(0,0,canvas.width,canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      canvasTag.textContent = '👑 Oficiálna finálna verzia';
+      canvasTag.textContent = '👑 Official final version';
       return;
     }
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    // poradie odzadu dopredu: Foto -> Background -> Text&Particles -> Basic skiny (vzdy) -> Skiny s efektmi (ak zapnute, prekryje basic)
+    // draw order back to front: Photo -> Background -> Text&Particles -> Basic skins (always) -> Skins with effects (if on, covers basic)
     if (state.foto && images.foto){
       ctx.drawImage(images.foto, 0, 0, canvas.width, canvas.height);
     }
