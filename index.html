@@ -290,45 +290,45 @@
     gap:6px;
   }
 
-  /* game modal */
-  .game-overlay{
-    position:fixed; inset:0; z-index:30;
-    background:rgba(2,3,5,0.85);
-    backdrop-filter: blur(6px);
-    display:flex; align-items:center; justify-content:center;
-    padding:16px;
-    opacity:0; pointer-events:none;
-    transition:opacity .25s ease;
+  /* inline design simulator, sits directly under the product cards */
+  .inline-game{
+    max-width:920px;
+    margin:36px auto 0;
+    position:relative; z-index:2;
   }
-  .game-overlay.open{ opacity:1; pointer-events:auto; }
-  .game-box{
-    width:100%; max-width:1100px;
-    aspect-ratio:16/10;
-    background:#1e1e1e;
+  .inline-game-label{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    color:var(--blue-hi);
+    margin-bottom:10px;
+    padding-left:2px;
+  }
+  .inline-game-frame{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/9;
     border-radius:16px;
     overflow:hidden;
-    position:relative;
     border:1px solid rgba(255,255,255,0.1);
-    transform:scale(0.97);
-    transition:transform .25s ease;
+    background:#1e1e1e;
   }
-  .game-overlay.open .game-box{ transform:scale(1); }
-  .game-box iframe{
+  .inline-game-frame iframe{
     width:100%; height:100%;
     border:none; display:block;
   }
-  .game-close{
-    position:absolute; top:10px; right:10px; z-index:2;
-    width:32px; height:32px;
-    border-radius:50%;
-    background:rgba(0,0,0,0.5);
-    color:#fff;
-    border:1px solid rgba(255,255,255,0.15);
-    font-size:16px;
-    cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
+  .inline-game-placeholder{
+    position:absolute; inset:0;
+    display:none;
+    align-items:center; justify-content:center;
+    text-align:center;
+    padding:24px;
+    font-size:14px;
+    color:var(--text-dim);
+    background:#0c0e12;
   }
-  .game-close:hover{ background:rgba(0,0,0,0.75); }
+  .inline-game-frame.empty iframe{ display:none; }
+  .inline-game-frame.empty .inline-game-placeholder{ display:flex; }
 
   .price-badge{
     position:absolute;
@@ -416,42 +416,6 @@
     box-shadow:0 0 30px rgba(87,163,224,0.15);
   }
   .launch-banner b{ color:var(--blue-hi); }
-
-  /* ---------- game promo banner ---------- */
-  .game-banner{
-    position:relative; z-index:6;
-    display:flex; align-items:center; justify-content:space-between;
-    flex-wrap:wrap; gap:18px;
-    max-width:920px; margin:0 auto;
-    padding:22px 28px;
-    background:linear-gradient(120deg, rgba(87,163,224,0.14), rgba(255,255,255,0.03));
-    border:1px solid rgba(87,163,224,0.35);
-    border-radius:18px;
-    box-shadow:0 0 40px rgba(87,163,224,0.15);
-    transform:translateY(-30px);
-  }
-  .game-banner-title{
-    font-family:'Space Grotesk', sans-serif;
-    font-weight:700; font-size:16.5px;
-    color:var(--text);
-  }
-  .game-banner-sub{
-    font-size:13px; color:var(--text-dim);
-    margin-top:4px; max-width:420px;
-  }
-  .game-banner-btn{
-    font-family:'Space Grotesk', sans-serif;
-    font-weight:600; font-size:14px;
-    color:#04060a; background:var(--blue-hi);
-    border:none; padding:13px 22px; border-radius:999px;
-    cursor:pointer; white-space:nowrap;
-    transition: transform .15s ease, box-shadow .15s ease;
-    box-shadow:0 0 24px rgba(87,163,224,0.35);
-  }
-  .game-banner-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 30px rgba(87,163,224,0.5); }
-  @media (max-width:640px){
-    .game-banner{ flex-direction:column; align-items:flex-start; margin:0 16px; }
-  }
 
   /* ---------- products section (chalkboard cards) ---------- */
   .products-section{
@@ -740,29 +704,22 @@
     </div>
   </div>
 
-  <div class="game-banner" id="gameBanner">
-    <div class="game-banner-text">
-      <div class="game-banner-title">🎮 Try it yourself before it launches</div>
-      <div class="game-banner-sub">Play with real GGFX layers — glow, particles, backgrounds — and see what you can create.</div>
-    </div>
-    <button class="game-banner-btn">Open the Design Simulator →</button>
-  </div>
-
   <div class="products-section" id="products">
     <div class="products-eyebrow">Digital Products</div>
     <div class="products-grid">
-      <div class="chalk-card playable" id="mcCard">
+      <div class="chalk-card playable" id="mcCard" data-game="design.html" data-game-label="Minecraft GFX Pack">
         <div class="chalk-pill"><span class="amt">€7.50</span><span class="lbl">Estimated Price</span></div>
         <div class="chalk-coming">Coming<br>Soon</div>
         <div class="chalk-name">Minecraft GFX Pack</div>
         <div class="chalk-desc">Textures, effects &amp; assets for Minecraft content — plus dozens more inside. ✨</div>
         <div class="chalk-play-hint">🎮 Click to try it yourself</div>
       </div>
-      <div class="chalk-card">
+      <div class="chalk-card playable" id="irlCard" data-game="" data-game-label="IRL GFX Pack">
         <div class="chalk-pill"><span class="amt">€7.50</span><span class="lbl">Estimated Price</span></div>
         <div class="chalk-coming">Coming<br>Soon</div>
         <div class="chalk-name">IRL GFX Pack</div>
         <div class="chalk-desc">Backgrounds, overlays &amp; effects for IRL content — plus dozens more inside. ✨</div>
+        <div class="chalk-play-hint">🎮 Click to try it yourself</div>
       </div>
       <div class="chalk-card featured">
         <div class="chalk-badge">Best Value</div>
@@ -770,6 +727,17 @@
         <div class="chalk-coming">Coming<br>Soon</div>
         <div class="chalk-name">Ultimate Bundle</div>
         <div class="chalk-desc">Both packs combined, plus a few extras.</div>
+      </div>
+    </div>
+
+    <!-- inline design simulator — swaps content depending on which card above was clicked.
+         Each playable card needs data-game="somefile.html" pointing to its own game build.
+         Cards with data-game="" (like IRL, for now) show the "coming soon" placeholder instead. -->
+    <div class="inline-game">
+      <div class="inline-game-label" id="inlineGameLabel">🎮 Minecraft GFX Pack — Design Simulator</div>
+      <div class="inline-game-frame">
+        <iframe id="inlineGameFrame" src="design.html" title="GGFX Design Simulator"></iframe>
+        <div class="inline-game-placeholder" id="inlineGamePlaceholder">Design simulator for this pack is coming soon 👀</div>
       </div>
     </div>
   </div>
@@ -818,27 +786,37 @@
     // only on first open (lazy load), so it doesn't slow down the initial page load
     // wrapped in DOMContentLoaded so it runs only once every element below exists in the DOM
     document.addEventListener('DOMContentLoaded', () => {
-      const mcCard = document.getElementById('mcCard');
-      const gameOverlay = document.getElementById('gameOverlay');
-      const gameFrame = document.getElementById('gameFrame');
-      const gameClose = document.getElementById('gameClose');
-      const gameBannerBtn = document.querySelector('.game-banner-btn');
-      let gameLoaded = false;
+      const playableCards = document.querySelectorAll('.chalk-card.playable');
+      const inlineFrame = document.getElementById('inlineGameFrame');
+      const inlineFrameBox = inlineFrame.parentElement; // .inline-game-frame
+      const inlineLabel = document.getElementById('inlineGameLabel');
+      const loadedSrcs = new Set();
 
-      function openGame(){
-        if (!gameLoaded){
-          gameFrame.src = 'design.html';
-          gameLoaded = true;
+      function showGameFor(card){
+        const gamePath = card.dataset.game;
+        const label = card.dataset.gameLabel || card.querySelector('.chalk-name')?.textContent || '';
+
+        if (!gamePath){
+          // this pack doesn't have a design simulator yet -> show placeholder
+          inlineFrameBox.classList.add('empty');
+          inlineFrame.src = '';
+          inlineLabel.textContent = `🎮 ${label} — Design Simulator`;
+          return;
         }
-        gameOverlay.classList.add('open');
+
+        inlineFrameBox.classList.remove('empty');
+        if (inlineFrame.getAttribute('src') !== gamePath){
+          inlineFrame.src = gamePath;
+        }
+        inlineLabel.textContent = `🎮 ${label} — Design Simulator`;
+
+        // scroll the game area into view so the switch is obvious
+        document.querySelector('.inline-game').scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-      function closeGame(){
-        gameOverlay.classList.remove('open');
-      }
-      mcCard.addEventListener('click', openGame);
-      gameBannerBtn.addEventListener('click', openGame);
-      gameClose.addEventListener('click', closeGame);
-      gameOverlay.addEventListener('click', (e) => { if (e.target === gameOverlay) closeGame(); });
+
+      playableCards.forEach(card => {
+        card.addEventListener('click', () => showGameFor(card));
+      });
     });
   </script>
 
@@ -953,13 +931,6 @@
       setTimeout(hideLoader, MAX_SHOW);
     })();
   </script>
-
-  <div class="game-overlay" id="gameOverlay">
-    <div class="game-box">
-      <button class="game-close" id="gameClose">✕</button>
-      <iframe id="gameFrame" src="" title="GGFX — Design it yourself"></iframe>
-    </div>
-  </div>
 
   <!-- hidden real Google Form submission target -->
   <iframe name="hidden_gform_iframe" id="hidden_gform_iframe" style="display:none;"></iframe>
