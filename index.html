@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GGFX — soon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --text: #eef3f8;
+    --text-dim: #7c8ca0;
+    --blue-4: #2f74b8;
+    --blue-hi: #57a3e0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:100%;background:#04060a;}
+  body{
+    position:relative;
+    font-family:'Inter', sans-serif;
+  }
+
+  /* ---------- ghost loading overlay ---------- */
+  .ghost-loader{
+    position:fixed; inset:0; z-index:9999;
+    background:#04060a;
+    display:flex; align-items:center; justify-content:center;
+    transition: opacity .5s ease;
+  }
+  .ghost-loader.hide{ opacity:0; pointer-events:none; }
+  .ghost-inner{
+    width:100%; max-width:720px;
+    padding:0 24px;
+    display:flex; flex-direction:column; gap:28px;
+  }
+  .ghost-row{ display:flex; align-items:center; gap:12px; }
+  .ghost-row.header{ justify-content:space-between; }
+  .ghost-row.buttons{ justify-content:center; gap:16px; margin-top:8px; }
+  .ghost-shape{
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 37%, rgba(255,255,255,0.04) 63%);
+    background-size: 400% 100%;
+    animation: ghostShimmer 1.6s ease-in-out infinite;
+    border-radius:999px;
+  }
+  .ghost-shape.circle{ width:36px; height:36px; border-radius:50%; flex-shrink:0; }
+  .ghost-shape.circle.small{ width:22px; height:22px; }
+  .ghost-shape.pill{ height:14px; border-radius:999px; }
+  .ghost-shape.pill.w40{ width:80px; }
+  .ghost-shape.pill.w60{ width:120px; }
+  .ghost-shape.pill.btn{ width:130px; height:38px; border-radius:999px; }
+  .ghost-box{
+    width:100%; aspect-ratio:16/9;
+    border-radius:16px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 37%, rgba(255,255,255,0.03) 63%);
+    background-size:400% 100%;
+    animation: ghostShimmer 1.6s ease-in-out infinite;
+    position:relative;
+  }
+  .ghost-box::after{
+    content:""; position:absolute; top:50%; left:50%;
+    width:56px; height:56px; margin:-28px 0 0 -28px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.08);
+  }
+  @keyframes ghostShimmer{
+    0%{ background-position: 100% 50%; }
+    100%{ background-position: 0% 50%; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ghost-shape, .ghost-box{ animation:none !important; }
+  }
+  /* ---------- /ghost loading overlay ---------- */
+
+  .hero{
+    position:relative;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+
+  /* the reference photo itself, recolored to blue via a luminance duotone filter
+     (so the shape/texture is 1:1 identical to the source, only the color changes) */
+  .photo{
+    position:absolute; inset:0;
+    background-image:url("bg.jpg");
+    background-size: cover;
+    background-position: center 30%;
+    filter: url(#duotone) saturate(1.25) contrast(1.15) brightness(1.05);
+    transform: scale(1.08);
+    animation: slowPan 40s ease-in-out infinite alternate;
+    z-index:0;
+  }
+
+  @keyframes slowPan{
+    0%{ transform: scale(1.08) translate(0,0); }
+    100%{ transform: scale(1.14) translate(-1.2%, -1.5%); }
+  }
+
+  /* soft ambient blobs — the classic slow-drifting gradient glow accent */
+  .ambient{ position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none; }
+  .ambient span{
+    position:absolute;
+    border-radius:50%;
+    filter: blur(70px);
+    mix-blend-mode: screen;
+    opacity:0.7;
+  }
+  .a1{
+    width:48vw; height:48vw; top:-14%; left:-12%;
+    background: radial-gradient(circle, #4ea8e0 0%, transparent 70%);
+    animation: floatA 11s ease-in-out infinite alternate;
+  }
+  .a2{
+    width:42vw; height:42vw; bottom:-16%; right:-10%;
+    background: radial-gradient(circle, #2f74b8 0%, transparent 70%);
+    animation: floatB 14s ease-in-out infinite alternate;
+  }
+  .a3{
+    width:30vw; height:30vw; top:30%; right:8%;
+    background: radial-gradient(circle, #6cc0f0 0%, transparent 70%);
+    opacity:0.5;
+    animation: floatA 9s ease-in-out infinite alternate-reverse;
+  }
+  .a4{
+    width:24vw; height:24vw; bottom:10%; left:36%;
+    background: radial-gradient(circle, #8fd0f5 0%, transparent 70%);
+    opacity:0.45;
+    animation: floatB 8s ease-in-out infinite alternate;
+  }
+  @keyframes floatA{
+    0%{   transform: translate(0,0) scale(1);           border-radius:50%; }
+    33%{  transform: translate(14vw,16vh) scale(1.35);   border-radius:42% 58% 63% 37% / 45% 40% 60% 55%; }
+    66%{  transform: translate(24vw,6vh) scale(1.6);     border-radius:60% 40% 45% 55% / 55% 62% 38% 45%; }
+    100%{ transform: translate(6vw,26vh) scale(1.2);     border-radius:38% 62% 55% 45% / 60% 35% 65% 40%; }
+  }
+  @keyframes floatB{
+    0%{   transform: translate(0,0) scale(1);            border-radius:50%; }
+    33%{  transform: translate(-16vw,-12vh) scale(0.75);  border-radius:56% 44% 38% 62% / 42% 60% 40% 58%; }
+    66%{  transform: translate(-26vw,-20vh) scale(1.45);  border-radius:44% 56% 60% 40% / 58% 38% 62% 42%; }
+    100%{ transform: translate(-8vw,-6vh) scale(1.15);    border-radius:62% 38% 45% 55% / 40% 55% 45% 60%; }
+  }
+
+  /* faint grid, matches the graph texture in the reference */
+  .grid{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(120% 90% at 50% 35%, black 30%, transparent 88%);
+            mask-image: radial-gradient(120% 90% at 50% 35%, black 30%, transparent 88%);
+    z-index:2;
+  }
+
+  /* faint grid, matches the graph texture in the reference */
+  .grain{
+    position:absolute; inset:0; z-index:3; opacity:0.06; pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'120\' height=\'120\'><filter id=\'n\'><feTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'2\' stitchTiles=\'stitch\'/></filter><rect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/></svg>");
+  }
+
+  /* vignette, focuses the eye on the center like the reference */
+  .vignette{
+    position:absolute; inset:0; z-index:4; pointer-events:none;
+    background: radial-gradient(120% 90% at 50% 55%, transparent 35%, rgba(2,3,5,0.8) 100%);
+  }
+
+  .content{
+    position:relative;
+    z-index:5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:24px;
+    padding:0 24px;
+    opacity:0;
+    transform: translateY(24px);
+    animation: slideIn 1s cubic-bezier(.22,.9,.3,1) 0.2s forwards;
+  }
+  .wordmark{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(40px, 8vw, 96px);
+    letter-spacing:0.02em;
+    color:var(--text);
+    line-height:1;
+    text-shadow: 0 0 40px rgba(87,163,224,0.4), 0 0 90px rgba(47,116,184,0.3);
+    white-space:nowrap;
+  }
+  .rule{ width:1px; height:clamp(28px, 5vw, 56px); background:var(--blue-4); flex-shrink:0; }
+  .sub{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:clamp(26px, 5vw, 56px);
+    letter-spacing:0.04em;
+    color:#fbfdff;
+    white-space:nowrap;
+  }
+
+  @keyframes slideIn{
+    from{ opacity:0; transform: translateY(24px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .photo, .content{ animation:none !important; opacity:1 !important; transform:scale(1.1) !important; }
+    .content{ opacity:1 !important; transform:none !important; }
+  }
+
+  /* below-fold section: info text, trailer placeholder, interest button */
+  .below{
+    position:relative;
+    background:#050609;
+    padding:64px 24px 80px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:40px;
+    text-align:center;
+  }
+  .info-text{
+    max-width:560px;
+    color:var(--text-dim);
+    font-size:15px;
+    line-height:1.6;
+  }
+  /* replace this placeholder paragraph with real copy later */
+  .info-text.placeholder{ font-style:italic; opacity:0.6; }
+
+  .video-slot{
+    width:100%;
+    max-width:720px;
+    aspect-ratio:16/9;
+    border-radius:16px;
+    border:1px dashed rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.02);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text-dim);
+    font-size:14px;
+    letter-spacing:0.02em;
+    overflow:hidden;
+  }
+  /* to embed the real trailer later, replace this whole .video-slot div with:
+     <video class="video-slot" src="trailer.mp4" controls playsinline></video> */
+
+  /* pricing cards */
+  .pricing{
+    width:100%;
+    max-width:920px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:16px;
+  }
+  .price-card{
+    flex:1 1 240px;
+    max-width:280px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:16px;
+    padding:28px 22px;
+    text-align:left;
+    position:relative;
+  }
+  .price-card.featured{
+    background:linear-gradient(160deg, rgba(87,163,224,0.12), rgba(255,255,255,0.03));
+    border-color:rgba(87,163,224,0.5);
+    box-shadow:0 0 40px rgba(87,163,224,0.15);
+  }
+
+  /* Minecraft card doubles as a launcher for the "Design it yourself" game */
+  .price-card.playable{
+    cursor:pointer;
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .price-card.playable:hover{
+    transform:translateY(-3px);
+    border-color:rgba(87,163,224,0.45);
+  }
+  .price-play-hint{
+    font-size:12px;
+    font-weight:600;
+    color:var(--blue-hi);
+    margin-top:14px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+
+  /* game modal */
+  .game-overlay{
+    position:fixed; inset:0; z-index:30;
+    background:rgba(2,3,5,0.85);
+    backdrop-filter: blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    padding:16px;
+    opacity:0; pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  .game-overlay.open{ opacity:1; pointer-events:auto; }
+  .game-box{
+    width:100%; max-width:1100px;
+    aspect-ratio:16/10;
+    background:#1e1e1e;
+    border-radius:16px;
+    overflow:hidden;
+    position:relative;
+    border:1px solid rgba(255,255,255,0.1);
+    transform:scale(0.97);
+    transition:transform .25s ease;
+  }
+  .game-overlay.open .game-box{ transform:scale(1); }
+  .game-box iframe{
+    width:100%; height:100%;
+    border:none; display:block;
+  }
+  .game-close{
+    position:absolute; top:10px; right:10px; z-index:2;
+    width:32px; height:32px;
+    border-radius:50%;
+    background:rgba(0,0,0,0.5);
+    color:#fff;
+    border:1px solid rgba(255,255,255,0.15);
+    font-size:16px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .game-close:hover{ background:rgba(0,0,0,0.75); }
+
+  .price-badge{
+    position:absolute;
+    top:-11px; left:22px;
+    background:var(--blue-hi);
+    color:#04060a;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .price-name{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:18px;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+  .price-desc{
+    font-size:13px;
+    color:var(--text-dim);
+    line-height:1.5;
+    margin-bottom:18px;
+    min-height:38px;
+  }
+  .price-amount{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:28px;
+    color:var(--text);
+  }
+  .price-amount span{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    color:var(--blue-hi);
+    display:block;
+    margin-top:6px;
+  }
+  .price-teaser{
+    font-size:12.5px;
+    color:var(--blue-hi);
+    font-weight:600;
+    margin-top:10px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .price-mystery{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:19px;
+    color:var(--text);
+    letter-spacing:0.01em;
+  }
+  .price-mystery span{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    color:var(--blue-hi);
+    display:block;
+    margin-top:6px;
+  }
+
+  .launch-banner{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 20px;
+    border-radius:999px;
+    background:rgba(87,163,224,0.1);
+    border:1px solid rgba(87,163,224,0.35);
+    color:var(--text);
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    letter-spacing:0.01em;
+    box-shadow:0 0 30px rgba(87,163,224,0.15);
+  }
+  .launch-banner b{ color:var(--blue-hi); }
+
+  /* ---------- game promo banner ---------- */
+  .game-banner{
+    position:relative; z-index:6;
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:18px;
+    max-width:920px; margin:0 auto;
+    padding:22px 28px;
+    background:linear-gradient(120deg, rgba(87,163,224,0.14), rgba(255,255,255,0.03));
+    border:1px solid rgba(87,163,224,0.35);
+    border-radius:18px;
+    box-shadow:0 0 40px rgba(87,163,224,0.15);
+    transform:translateY(-30px);
+  }
+  .game-banner-title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:16.5px;
+    color:var(--text);
+  }
+  .game-banner-sub{
+    font-size:13px; color:var(--text-dim);
+    margin-top:4px; max-width:420px;
+  }
+  .game-banner-btn{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600; font-size:14px;
+    color:#04060a; background:var(--blue-hi);
+    border:none; padding:13px 22px; border-radius:999px;
+    cursor:pointer; white-space:nowrap;
+    transition: transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 0 24px rgba(87,163,224,0.35);
+  }
+  .game-banner-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 30px rgba(87,163,224,0.5); }
+  @media (max-width:640px){
+    .game-banner{ flex-direction:column; align-items:flex-start; margin:0 16px; }
+  }
+
+  /* ---------- products section (chalkboard cards) ---------- */
+  .products-section{
+    position:relative;
+    background:#050609;
+    padding:76px 24px 20px;
+  }
+  .products-eyebrow{
+    text-align:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:36px;
+  }
+  .products-grid{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:20px;
+    max-width:980px; margin:0 auto;
+  }
+  .chalk-card{
+    position:relative;
+    flex:1 1 260px; max-width:300px; min-height:360px;
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,0.07);
+    background:radial-gradient(120% 120% at 30% 15%, #1c1c1e 0%, #0c0c0d 70%);
+    padding:22px;
+    display:flex; flex-direction:column;
+  }
+  .chalk-card::after{
+    content:"";
+    position:absolute; inset:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity:0.08;
+    pointer-events:none;
+  }
+  .chalk-card.playable{ cursor:pointer; transition:transform .15s ease, border-color .15s ease; }
+  .chalk-card.playable:hover{ transform:translateY(-3px); border-color:rgba(87,163,224,0.4); }
+  .chalk-card.featured{ border-color:rgba(74,222,128,0.35); }
+
+  .chalk-pill{
+    align-self:flex-end;
+    background:var(--text); color:#0a0a0a;
+    border-radius:999px;
+    padding:8px 16px;
+    text-align:center;
+    font-family:'Space Grotesk', sans-serif;
+    position:relative; z-index:2;
+  }
+  .chalk-pill .amt{ font-weight:700; font-size:17px; display:block; }
+  .chalk-pill .lbl{ font-weight:600; font-size:9.5px; letter-spacing:0.06em; text-transform:uppercase; color:#5b5b5b; display:block; margin-top:1px; }
+  .chalk-pill.mystery{ display:flex; align-items:center; gap:6px; padding:9px 16px; }
+  .chalk-pill.mystery .amt{ font-size:12.5px; }
+
+  .chalk-badge{
+    position:absolute; top:20px; left:20px; z-index:2;
+    background:#3ddc84; color:#04250f;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:10.5px;
+    letter-spacing:0.05em; text-transform:uppercase;
+    padding:6px 12px; border-radius:999px;
+  }
+
+  .chalk-coming{
+    position:relative; z-index:1;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:800;
+    font-size:40px;
+    line-height:0.92;
+    color:rgba(255,255,255,0.13);
+    margin-top:38px;
+  }
+  .chalk-name{
+    position:relative; z-index:2;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:19px;
+    color:var(--text);
+    margin-top:14px;
+  }
+  .chalk-desc{
+    position:relative; z-index:2;
+    font-size:12.5px; line-height:1.5;
+    color:var(--text-dim);
+    margin-top:8px;
+  }
+  .chalk-play-hint{
+    position:relative; z-index:2;
+    font-size:11.5px; font-weight:600;
+    color:var(--blue-hi);
+    margin-top:auto;
+    padding-top:14px;
+    display:flex; align-items:center; gap:6px;
+  }
+
+
+  .interest-btn{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:15px;
+    letter-spacing:0.02em;
+    color:#04060a;
+    background:var(--text);
+    border:none;
+    padding:16px 32px;
+    border-radius:999px;
+    cursor:pointer;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    box-shadow: 0 0 30px rgba(87,163,224,0.25);
+  }
+  .interest-btn:hover{ transform:translateY(-2px); box-shadow: 0 6px 34px rgba(87,163,224,0.4); }
+  .interest-btn:disabled{
+    background:rgba(255,255,255,0.08);
+    color:var(--text-dim);
+    cursor:default;
+    transform:none;
+    box-shadow:none;
+  }
+
+  /* confirmation modal */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:20;
+    background:rgba(2,3,5,0.72);
+    backdrop-filter: blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+    opacity:0; pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+  .modal{
+    width:100%; max-width:420px;
+    background:#0b0f16;
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px;
+    padding:28px 26px;
+    text-align:left;
+    transform:translateY(10px);
+    transition:transform .2s ease;
+  }
+  .modal-overlay.open .modal{ transform:translateY(0); }
+  .modal h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:18px;
+    color:var(--text);
+    margin-bottom:12px;
+  }
+  .modal p{
+    color:var(--text-dim);
+    font-size:14px;
+    line-height:1.6;
+    margin-bottom:22px;
+  }
+  .modal-actions{ display:flex; gap:10px; }
+  .modal-actions button{
+    flex:1;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:12px 16px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+  }
+  .modal-confirm{ background:var(--blue-hi); color:#04060a; }
+  .modal-cancel{ background:rgba(255,255,255,0.06); color:var(--text-dim); }
+
+  .modal-step{ display:none; }
+  .modal-step.active{ display:block; }
+  .modal-field{
+    width:100%;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px;
+    padding:12px 14px;
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    margin-bottom:12px;
+    outline:none;
+  }
+  .modal-field:focus{ border-color:var(--blue-hi); }
+  .modal-field::placeholder{ color:var(--text-dim); }
+  .modal-error{
+    color:#ff8a8a;
+    font-size:12.5px;
+    margin:-6px 0 12px;
+    display:none;
+  }
+
+  .visit-counter{
+    position:fixed;
+    bottom:16px;
+    right:16px;
+    z-index:15;
+    font-family:'Inter', sans-serif;
+    font-size:11px;
+    letter-spacing:0.04em;
+    color:rgba(255,255,255,0.5);
+    background:rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.08);
+    opacity:0;
+    transition:opacity .4s ease;
+  }
+  .visit-counter.show{ opacity:1; }
+
+  /* ---------- mierna optimalizácia pre menšie / slabšie zariadenia ---------- */
+  /* Cieľ: znížiť GPU záťaž (blur, filtre), nie efekty úplne vypnúť. */
+  @media (max-width: 768px){
+    /* blur je najdrahšia časť ambient blobov — zmenšíme polomer, necháme pohyb */
+    .ambient span{ filter: blur(40px); }
+
+    /* fotka: necháme duotone (potrebný pre vzhľad), len vypustíme extra saturate/contrast vrstvu */
+    .photo{ filter: url(#duotone) brightness(1.05); }
+
+    /* modal: backdrop-filter blur je na slabšom mobile znateľne pomalý,
+       nahradíme mierne tmavším pozadím bez blur-u */
+    .modal-overlay{ backdrop-filter: none; background: rgba(2,3,5,0.86); }
+  }
+
+  /* na naozaj úzkych / nízkovýkonných zariadeniach o čosi viac ubereme */
+  @media (max-width: 420px){
+    .ambient span{ filter: blur(28px); opacity:0.55; }
+    .photo{ animation-duration: 60s; } /* ten istý pan, len pomalší = menej prepočtov za sekundu */
+  }
+</style>
+</head>
+<body>
+
+  <!-- ghost loading overlay: shown immediately, hidden once the page has fully loaded -->
+  <div class="ghost-loader" id="ghostLoader">
+    <div class="ghost-inner">
+      <div class="ghost-row header">
+        <div class="ghost-shape circle"></div>
+        <div class="ghost-shape pill w60"></div>
+        <div class="ghost-shape pill w40"></div>
+        <div class="ghost-shape circle small"></div>
+      </div>
+      <div class="ghost-row buttons">
+        <div class="ghost-shape pill btn"></div>
+        <div class="ghost-shape pill btn"></div>
+      </div>
+      <div class="ghost-box"></div>
+    </div>
+  </div>
+
+  <!-- SVG duotone filter: converts the photo to luminance, then maps
+       shadows -> dark navy and highlights -> bright azure
+       (uses a red-weighted brightness proxy, not true luma, so the
+       vivid red canopy in the source maps to the bright end, not the dark end) -->
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="duotone">
+      <feColorMatrix type="matrix" values="
+        0.68 0.22 0.10 0 0
+        0.68 0.22 0.10 0 0
+        0.68 0.22 0.10 0 0
+        0    0    0    1 0"/>
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0.02 0.42"/>
+        <feFuncG type="table" tableValues="0.06 0.74"/>
+        <feFuncB type="table" tableValues="0.12 0.98"/>
+      </feComponentTransfer>
+    </filter>
+  </svg>
+
+  <div class="hero" id="top">
+    <div class="photo"></div>
+    <div class="ambient">
+      <span class="a1"></span>
+      <span class="a2"></span>
+      <span class="a3"></span>
+      <span class="a4"></span>
+    </div>
+    <div class="grid"></div>
+    <div class="grain"></div>
+    <div class="vignette"></div>
+
+    <div class="content">
+      <div class="wordmark">GGFX</div>
+      <div class="rule"></div>
+      <div class="sub">soon</div>
+    </div>
+  </div>
+
+  <div class="game-banner" id="gameBanner">
+    <div class="game-banner-text">
+      <div class="game-banner-title">🎮 Try it yourself before it launches</div>
+      <div class="game-banner-sub">Play with real GGFX layers — glow, particles, backgrounds — and see what you can create.</div>
+    </div>
+    <button class="game-banner-btn">Open the Design Simulator →</button>
+  </div>
+
+  <div class="products-section" id="products">
+    <div class="products-eyebrow">Digital Products</div>
+    <div class="products-grid">
+      <div class="chalk-card playable" id="mcCard">
+        <div class="chalk-pill"><span class="amt">€7.50</span><span class="lbl">Estimated Price</span></div>
+        <div class="chalk-coming">Coming<br>Soon</div>
+        <div class="chalk-name">Minecraft GFX Pack</div>
+        <div class="chalk-desc">Textures, effects &amp; assets for Minecraft content — plus dozens more inside. ✨</div>
+        <div class="chalk-play-hint">🎮 Click to try it yourself</div>
+      </div>
+      <div class="chalk-card">
+        <div class="chalk-pill"><span class="amt">€7.50</span><span class="lbl">Estimated Price</span></div>
+        <div class="chalk-coming">Coming<br>Soon</div>
+        <div class="chalk-name">IRL GFX Pack</div>
+        <div class="chalk-desc">Backgrounds, overlays &amp; effects for IRL content — plus dozens more inside. ✨</div>
+      </div>
+      <div class="chalk-card featured">
+        <div class="chalk-badge">Best Value</div>
+        <div class="chalk-pill mystery">🔒<span class="amt">Price revealed<br>at launch</span></div>
+        <div class="chalk-coming">Coming<br>Soon</div>
+        <div class="chalk-name">Ultimate Bundle</div>
+        <div class="chalk-desc">Both packs combined, plus a few extras.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="below" id="benefits">
+    <!-- 3. info text — replace this placeholder with the real copy later -->
+    <p class="info-text placeholder">Info text coming soon — this paragraph will explain what GGFX is.</p>
+
+    <div class="launch-banner">🚀 Estimated launch: <b>September 1, 2026</b></div>
+
+    <!-- 4. trailer — replace this div with:
+         <video class="video-slot" src="trailer.mp4" controls playsinline></video> -->
+    <div class="video-slot">Trailer coming soon</div>
+
+    <button class="interest-btn" id="interestBtn">Preliminary Interest</button>
+  </div>
+
+  <div class="visit-counter" id="visitCounter"></div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-step active" id="stepConfirm">
+        <h3>Before you confirm</h3>
+        <p>Only click "I'm interested" if you have genuine interest in GGFX — not just curiosity. This helps us gauge real demand before launch.</p>
+        <div class="modal-actions">
+          <button class="modal-cancel" id="modalCancel">Cancel</button>
+          <button class="modal-confirm" id="modalConfirm">I'm interested</button>
+        </div>
+      </div>
+      <div class="modal-step" id="stepForm">
+        <h3>Almost done</h3>
+        <p>Leave your name and email so we can notify you the moment GGFX launches.</p>
+        <input class="modal-field" id="fieldName" type="text" placeholder="Your name">
+        <input class="modal-field" id="fieldEmail" type="email" placeholder="Your email">
+        <div class="modal-error" id="formError">Please fill in both fields with a valid email.</div>
+        <div class="modal-actions">
+          <button class="modal-cancel" id="formCancel">Cancel</button>
+          <button class="modal-confirm" id="formSubmit">Notify me</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // "Design it yourself" game modal — loads design.html into the iframe
+    // only on first open (lazy load), so it doesn't slow down the initial page load
+    // wrapped in DOMContentLoaded so it runs only once every element below exists in the DOM
+    document.addEventListener('DOMContentLoaded', () => {
+      const mcCard = document.getElementById('mcCard');
+      const gameOverlay = document.getElementById('gameOverlay');
+      const gameFrame = document.getElementById('gameFrame');
+      const gameClose = document.getElementById('gameClose');
+      const gameBannerBtn = document.querySelector('.game-banner-btn');
+      let gameLoaded = false;
+
+      function openGame(){
+        if (!gameLoaded){
+          gameFrame.src = 'design.html';
+          gameLoaded = true;
+        }
+        gameOverlay.classList.add('open');
+      }
+      function closeGame(){
+        gameOverlay.classList.remove('open');
+      }
+      mcCard.addEventListener('click', openGame);
+      gameBannerBtn.addEventListener('click', openGame);
+      gameClose.addEventListener('click', closeGame);
+      gameOverlay.addEventListener('click', (e) => { if (e.target === gameOverlay) closeGame(); });
+    });
+  </script>
+
+  <script>
+    const NAMESPACE = 'ggfx-store';
+    const API = 'https://api.counterapi.dev/v1';
+
+    // --- public visit counter ---
+    fetch(`${API}/${NAMESPACE}/visits/up`)
+      .then(r => r.json())
+      .then(d => {
+        const el = document.getElementById('visitCounter');
+        el.textContent = `${d.count.toLocaleString()} visits`;
+        el.classList.add('show');
+      })
+      .catch(() => {});
+
+    // --- preliminary interest: confirm -> name/email form -> Google Forms ---
+    // TODO: replace these 3 placeholders once the Google Form is created
+    const GFORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLScDmT0StwDGFOdTSpko2iNYebI4pE3vFze835fZ--pUJwXP9w/formResponse';
+    const GFORM_ENTRY_NAME = 'entry.295630599';
+    const GFORM_ENTRY_EMAIL = 'entry.1916133259';
+
+    const interestBtn = document.getElementById('interestBtn');
+    const overlay = document.getElementById('modalOverlay');
+    const stepConfirm = document.getElementById('stepConfirm');
+    const stepForm = document.getElementById('stepForm');
+    const cancelBtn = document.getElementById('modalCancel');
+    const confirmBtn = document.getElementById('modalConfirm');
+    const formCancelBtn = document.getElementById('formCancel');
+    const submitBtn = document.getElementById('formSubmit');
+    const nameField = document.getElementById('fieldName');
+    const emailField = document.getElementById('fieldEmail');
+    const formError = document.getElementById('formError');
+    const ALREADY_KEY = 'ggfx_interest_given';
+
+    function closeModal(){
+      overlay.classList.remove('open');
+      stepForm.classList.remove('active');
+      stepConfirm.classList.add('active');
+      formError.style.display = 'none';
+      nameField.value = '';
+      emailField.value = '';
+    }
+
+    if (localStorage.getItem(ALREADY_KEY)) {
+      interestBtn.textContent = '✓ Thanks, noted!';
+      interestBtn.disabled = true;
+    }
+
+    interestBtn.addEventListener('click', () => {
+      if (interestBtn.disabled) return;
+      overlay.classList.add('open');
+    });
+    cancelBtn.addEventListener('click', closeModal);
+    formCancelBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+
+    confirmBtn.addEventListener('click', () => {
+      stepConfirm.classList.remove('active');
+      stepForm.classList.add('active');
+    });
+
+    submitBtn.addEventListener('click', () => {
+      const name = nameField.value.trim();
+      const email = emailField.value.trim();
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      if (!name || !emailOk) {
+        formError.style.display = 'block';
+        return;
+      }
+      formError.style.display = 'none';
+
+      // send to Google Forms via a real <form> POST into a hidden iframe —
+      // more reliable than fetch(no-cors), which some browsers/ad-blockers silently drop
+      document.getElementById('gformName').value = name;
+      document.getElementById('gformEmail').value = email;
+      document.getElementById('gformHidden').submit();
+
+      // private interest counter
+      fetch(`${API}/${NAMESPACE}/interest/up`).catch(() => {});
+
+      overlay.classList.remove('open');
+      interestBtn.textContent = '✓ Thanks, noted!';
+      interestBtn.disabled = true;
+      try { localStorage.setItem(ALREADY_KEY, '1'); } catch(e) {}
+    });
+  </script>
+
+  <!-- ghost loading overlay: hide once the page (incl. fonts, background photo) has finished loading -->
+  <script>
+    (function(){
+      const loader = document.getElementById('ghostLoader');
+      const MIN_SHOW = 500;   // ms — aby loader nebliknul pri veľmi rýchlom pripojení
+      const MAX_SHOW = 6000;  // ms — poistka, keby 'load' event z nejakého dôvodu neprišiel
+      const start = Date.now();
+      let done = false;
+
+      function hideLoader(){
+        if (done) return;
+        done = true;
+        const elapsed = Date.now() - start;
+        const wait = Math.max(0, MIN_SHOW - elapsed);
+        setTimeout(() => {
+          loader.classList.add('hide');
+          setTimeout(() => loader.remove(), 550);
+        }, wait);
+      }
+
+      window.addEventListener('load', hideLoader);
+      setTimeout(hideLoader, MAX_SHOW);
+    })();
+  </script>
+
+  <div class="game-overlay" id="gameOverlay">
+    <div class="game-box">
+      <button class="game-close" id="gameClose">✕</button>
+      <iframe id="gameFrame" src="" title="GGFX — Design it yourself"></iframe>
+    </div>
+  </div>
+
+  <!-- hidden real Google Form submission target -->
+  <iframe name="hidden_gform_iframe" id="hidden_gform_iframe" style="display:none;"></iframe>
+  <form id="gformHidden" action="https://docs.google.com/forms/d/e/1FAIpQLScDmT0StwDGFOdTSpko2iNYebI4pE3vFze835fZ--pUJwXP9w/formResponse"
+        method="POST" target="hidden_gform_iframe" style="display:none;">
+    <input type="text" name="entry.295630599" id="gformName">
+    <input type="text" name="entry.1916133259" id="gformEmail">
+  </form>
+
+</body>
+</html>
