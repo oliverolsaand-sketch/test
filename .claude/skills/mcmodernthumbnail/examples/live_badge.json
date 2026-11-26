@@ -1,0 +1,12 @@
+{
+  "_comment": "Ref 2 look: blurred server spawn screenshot, LIVE badge left, waving character right. Replace YOUR_NAME / bg.png / logo.png.",
+  "out": "live.png",
+  "preset": "airy",
+  "background": {"image": "bg.png", "blur": 9},
+  "sun": {"pos": [0.92, 0.02], "behind": true, "rays": 0.45},
+  "characters": [{"skin": "YOUR_NAME", "pose": "wave", "yaw": -28, "pitch": 4, "fov": 38,
+                  "height": 0.95, "x": 0.76, "y": 1.04}],
+  "particles": {"type": "snow", "count": 120},
+  "fog": 0.2,
+  "text": [{"type": "badge", "text": "LIVE", "icon": "", "x": 0.3, "y": 0.53, "height": 0.25}]
+}

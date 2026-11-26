@@ -1,0 +1,11 @@
+{
+  "_comment": "Ref 3 look: centred mid-air hero shot, golden haze. Replace YOUR_NAME / bg.png (or delete image for a procedural sky).",
+  "out": "hero.png",
+  "preset": "golden",
+  "background": {"image": "bg.png", "blur": 6},
+  "sun": {"pos": [0.88, -0.05], "behind": true, "rays": 0.7},
+  "characters": [{"skin": "YOUR_NAME", "pose": "leap", "yaw": -32, "pitch": 2, "fov": 40,
+                  "height": 0.88, "x": 0.5, "y": 0.95, "ground_shadow": false}],
+  "particles": {"type": "dust", "count": 150},
+  "text": [{"type": "watermark", "text": "YOUR_NAME", "font": "pacifico", "size": 0.06, "x": 0.1, "y": 0.92}]
+}
