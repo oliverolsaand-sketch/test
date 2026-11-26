@@ -1,0 +1,13 @@
+{
+  "_comment": "Ref 1 look: character from behind on the left, gazing at a bedwars island. Replace YOUR_NAME.",
+  "out": "bedwars_island.png",
+  "preset": "airy",
+  "background": {"top": "#1677e0", "horizon": "#bfeaff", "blur": 3, "clouds": 0.6},
+  "sun": {"pos": [0.05, 0.0], "behind": true, "rays": 0.65},
+  "props": [{"type": "island", "seed": 4, "theme": "sand", "defense": "wool",
+             "x": 0.7, "y": 0.47, "height": 0.95, "yaw": -35, "pitch": 24, "blur": 1.2}],
+  "characters": [{"skin": "YOUR_NAME", "pose": "look_back", "yaw": -150, "pitch": 14, "fov": 42,
+                  "height": 0.9, "x": 0.2, "y": 1.0, "item": "sword:diamond", "ground_shadow": false}],
+  "particles": {"type": "snow", "count": 170},
+  "text": [{"type": "watermark", "text": "YOUR_NAME", "x": 0.5, "y": 0.93}]
+}

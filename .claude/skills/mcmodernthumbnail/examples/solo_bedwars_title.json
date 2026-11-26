@@ -1,0 +1,13 @@
+{
+  "_comment": "Bedwars title thumbnail: sprinting attacker with enchanted sword + 3D title. Replace YOUR_NAME / bg.png.",
+  "out": "solo_bedwars.png",
+  "preset": "airy",
+  "background": {"image": "bg.png", "blur": 7},
+  "sun": {"pos": [0.95, 0.0], "behind": true, "rays": 0.5},
+  "characters": [{"skin": "YOUR_NAME", "pose": "sprint_attack", "yaw": -40, "pitch": 6, "fov": 40,
+                  "height": 1.0, "x": 0.68, "y": 1.06,
+                  "item": {"kind": "sword", "palette": "diamond", "enchant": true}}],
+  "particles": {"type": "snow", "count": 140},
+  "text": [{"type": "title", "text": "SOLO\nBEDWARS", "font": "lilita", "size": 0.17, "x": 0.25, "y": 0.42,
+            "fill": ["#ffffff", "#ffe066"], "rotate": 4}]
+}

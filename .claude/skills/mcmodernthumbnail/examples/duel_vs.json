@@ -1,0 +1,17 @@
+{
+  "_comment": "1v1 duel: two characters facing each other, punchy preset, VS title. Replace RED_NAME / BLUE_NAME / bg.png.",
+  "out": "duel.png",
+  "preset": "punchy",
+  "background": {"image": "bg.png", "blur": 8},
+  "sun": {"pos": [0.5, -0.1], "behind": true, "rays": 0.4},
+  "characters": [
+    {"skin": "RED_NAME", "pose": "swing", "yaw": -40, "fov": 40, "height": 0.95, "x": 0.24, "y": 1.05,
+     "item": "sword:netherite", "glow": {"color": "#ff4040", "radius": 0.03, "strength": 0.9}},
+    {"skin": "BLUE_NAME", "pose": "sprint_attack", "yaw": -40, "fov": 40, "height": 0.95, "x": 0.76, "y": 1.05,
+     "flip": true, "item": {"kind": "sword", "palette": "diamond", "enchant": true},
+     "glow": {"color": "#40a0ff", "radius": 0.03, "strength": 0.9}}
+  ],
+  "particles": {"type": "embers", "count": 90},
+  "text": [{"type": "title", "text": "VS", "font": "luckiest", "size": 0.3, "x": 0.5, "y": 0.45,
+            "fill": ["#ffffff", "#ffd23a"], "rotate": -6}]
+}
